@@ -35,3 +35,11 @@ main
 # SQLC generated code (regenerate with: sqlc generate)
 internal/database/db/
 
+# SQLite database files
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+*.db-wal
+*.db-shm
+
