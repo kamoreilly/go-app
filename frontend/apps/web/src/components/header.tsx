@@ -21,13 +21,6 @@ export default function Header() {
           </Link>
           <Link 
             to="/" 
-            hash="pricing"
-            className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-          >
-            Pricing
-          </Link>
-          <Link 
-            to="/" 
             className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
           >
             About

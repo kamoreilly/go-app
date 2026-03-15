@@ -49,15 +49,7 @@ function LoginComponent() {
               />
             </div>
             <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="password">Password</Label>
-                <Link 
-                  to="/login" 
-                  className="text-sm text-primary hover:text-primary/80"
-                >
-                  Forgot password?
-                </Link>
-              </div>
+              <Label htmlFor="password">Password</Label>
               <Input 
                 id="password" 
                 type="password" 
@@ -78,12 +70,6 @@ function LoginComponent() {
                 "Sign In"
               )}
             </Button>
-            <p className="text-center text-sm text-muted-foreground">
-              Don't have an account?{" "}
-              <Link to="/login" className="text-primary hover:text-primary/80 font-medium">
-                Sign up
-              </Link>
-            </p>
           </CardFooter>
         </form>
       </Card>
