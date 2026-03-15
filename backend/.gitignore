@@ -32,3 +32,6 @@ main
 # OS X generated file
 .DS_Store
 
+# SQLC generated code (regenerate with: sqlc generate)
+internal/database/db/
+
