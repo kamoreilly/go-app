@@ -1,7 +1,3 @@
-# CLAUDE.md
-
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-
 ## Project Overview
 
 Full-stack monorepo with a Go backend and a React/TypeScript frontend. The frontend is a Turborepo workspace managed with Bun.
