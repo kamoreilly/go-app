@@ -12,25 +12,9 @@ export default function Header() {
         </Link>
         
         <nav className="hidden md:flex items-center gap-6">
-          <Link 
-            to="/" 
-            hash="features"
-            className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-          >
-            Features
-          </Link>
-          <Link 
-            to="/" 
-            className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-          >
-            About
-          </Link>
         </nav>
 
         <div className="flex items-center gap-3">
-          <Button variant="ghost">
-            <Link to="/login">Sign In</Link>
-          </Button>
           <Button>
             <Link to="/login">Get Started</Link>
           </Button>
