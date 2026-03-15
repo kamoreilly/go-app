@@ -141,3 +141,35 @@
     color-scheme: light;
   }
 }
+
+@keyframes orbit-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@layer utilities {
+  .animate-orbit-spin {
+    animation: orbit-spin 34s linear infinite;
+  }
+
+  .animate-orbit-counter {
+    animation: orbit-spin 34s linear infinite reverse;
+  }
+
+  .integration-strike::after {
+    content: "";
+    position: absolute;
+    left: 10%;
+    right: 10%;
+    bottom: -18px;
+    height: 28px;
+    border-radius: 999px;
+    background: radial-gradient(circle at center, rgb(0 98 57 / 0.35), transparent 72%);
+    filter: blur(22px);
+    pointer-events: none;
+  }
+}
