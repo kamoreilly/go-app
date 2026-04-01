@@ -1,45 +1,50 @@
 import { Link } from "@tanstack/react-router";
-import { ChevronRight, Leaf } from "lucide-react";
+import { Leaf } from "lucide-react";
 
 import { buttonVariants } from "@/components/ui/button";
 
 export default function Header() {
   return (
-    <header className="sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/70">
-      <div className="container mx-auto flex h-20 max-w-7xl items-center justify-between gap-4 px-4">
-        <Link to="/" className="flex items-center gap-3">
-          <span className="flex size-11 items-center justify-center rounded-full border border-border/70 bg-accent/85 text-accent-foreground shadow-xs">
-            <Leaf className="h-5 w-5" />
+    <header className="sticky top-0 z-50 border-b border-border/50 bg-background/90 backdrop-blur-xl">
+      <div className="container mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
+        {/* Logo */}
+        <Link to="/" className="flex items-center gap-2.5">
+          <span className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+            <Leaf className="h-4 w-4" />
           </span>
-          <div>
-            <p className="text-lg font-extrabold tracking-tight sm:text-xl">CannaTrack</p>
-            <p className="hidden text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground sm:block">
-              Cultivation operations platform
-            </p>
-          </div>
+          <span className="text-base font-extrabold tracking-tight">CannaTrack</span>
         </Link>
 
-        <nav className="hidden items-center gap-2 rounded-full border border-border/60 bg-card/82 p-1.5 text-sm font-medium text-muted-foreground shadow-2xs md:flex">
-          <a href="/#platform" className="rounded-full px-4 py-2 transition-colors hover:bg-muted hover:text-foreground">
-            Platform
+        {/* Nav */}
+        <nav className="hidden items-center gap-1 text-sm font-medium text-muted-foreground md:flex">
+          <a href="/#features" className="rounded-lg px-3 py-2 transition-colors hover:bg-muted hover:text-foreground">
+            Features
           </a>
-          <a href="/#operations" className="rounded-full px-4 py-2 transition-colors hover:bg-muted hover:text-foreground">
-            Operations
-          </a>
-          <a href="/#compliance" className="rounded-full px-4 py-2 transition-colors hover:bg-muted hover:text-foreground">
-            Compliance
+          <a href="/#how-it-works" className="rounded-lg px-3 py-2 transition-colors hover:bg-muted hover:text-foreground">
+            How it works
           </a>
         </nav>
 
-        <div className="flex items-center gap-3">
+        {/* Actions */}
+        <div className="flex items-center gap-2">
           <Link
             to="/login"
             className={buttonVariants({
-              className: "px-5 shadow-sm",
+              variant: "ghost",
+              size: "sm",
+              className: "hidden text-sm font-medium sm:inline-flex",
             })}
           >
-            Sign In
-            <ChevronRight className="h-4 w-4" />
+            Log in
+          </Link>
+          <Link
+            to="/login"
+            className={buttonVariants({
+              size: "sm",
+              className: "rounded-lg px-4 text-sm font-semibold shadow-sm shadow-primary/20",
+            })}
+          >
+            Get started
           </Link>
         </div>
       </div>
