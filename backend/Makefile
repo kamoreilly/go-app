@@ -1,43 +1,36 @@
-# Simple Makefile for a Go project
+.PHONY: build run test lint clean dev tidy db-create help
 
-# Build the application
-all: build test
+BINARY_NAME=cultivator
+MAIN_PATH=./cmd/api
 
 build:
-	@echo "Building..."
-	
-	
-	@go build -o main cmd/api/main.go
+	go build -o $(BINARY_NAME) $(MAIN_PATH)
 
-# Run the application
-run:
-	@go run cmd/api/main.go
+run: build
+	./$(BINARY_NAME)
 
-# Test the application
+dev:
+	air -c .air.toml
+
 test:
-	@echo "Testing..."
-	@go test ./... -v
+	go test -v ./...
 
-# Clean the binary
+test-cover:
+	go test -v -coverprofile=coverage.out ./...
+	go tool cover -html=coverage.out -o coverage.html
+
+lint:
+	golangci-lint run ./...
+
 clean:
-	@echo "Cleaning..."
-	@rm -f main
+	rm -f $(BINARY_NAME) coverage.out coverage.html tmp/cultivator
 
-# Live Reload
-watch:
-	@if command -v air > /dev/null; then \
-            air; \
-            echo "Watching...";\
-        else \
-            read -p "Go's 'air' is not installed on your machine. Do you want to install it? [Y/n] " choice; \
-            if [ "$$choice" != "n" ] && [ "$$choice" != "N" ]; then \
-                go install github.com/air-verse/air@latest; \
-                air; \
-                echo "Watching...";\
-            else \
-                echo "You chose not to install air. Exiting..."; \
-                exit 1; \
-            fi; \
-        fi
+tidy:
+	go mod tidy
 
-.PHONY: all build run test clean watch
+db-create:
+	createdb cultivator || true
+	createdb cultivator_test || true
+
+help:
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-15s\033[0m %s\n", $$1, $$2}'

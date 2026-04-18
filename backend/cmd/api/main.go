@@ -1,58 +1,86 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"log"
-	"net/http"
+	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
-	"backend/internal/server"
+	"app/src/config"
+	"app/src/database"
+	"app/src/router"
+	"app/src/utils"
+
+	"github.com/gofiber/fiber/v3"
+	"github.com/gofiber/fiber/v3/middleware/cors"
+	"github.com/gofiber/fiber/v3/middleware/recover"
 )
 
-func gracefulShutdown(apiServer *http.Server, done chan bool) {
-	// Create context that listens for the interrupt signal from the OS.
-	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
-	defer stop()
-
-	// Listen for the interrupt signal.
-	<-ctx.Done()
-
-	log.Println("shutting down gracefully, press Ctrl+C again to force")
-	stop() // Allow Ctrl+C to force shutdown
-
-	// The context is used to inform the server it has 5 seconds to finish
-	// the request it is currently handling
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	if err := apiServer.Shutdown(ctx); err != nil {
-		log.Printf("Server forced to shutdown with error: %v", err)
+func main() {
+	cfg, err := config.Load(".env")
+	if err != nil {
+		log.Fatalf("config load failed: %v", err)
 	}
 
-	log.Println("Server exiting")
+	if err := database.Connect(cfg); err != nil {
+		utils.Log.WithError(err).Fatal("database connection failed")
+	}
+	defer database.Close()
 
-	// Notify the main goroutine that the shutdown is complete
-	done <- true
+	if err := database.Migrate(); err != nil {
+		utils.Log.WithError(err).Fatal("database migration failed")
+	}
+	utils.Log.Info("database migrations applied")
+
+	app := fiber.New(fiber.Config{
+		AppName:      "Cultivator API",
+		ReadTimeout:  10 * time.Second,
+		WriteTimeout: 30 * time.Second,
+		IdleTimeout:  60 * time.Second,
+		ErrorHandler: customErrorHandler,
+	})
+
+	app.Use(recover.New())
+	app.Use(cors.New(cors.Config{
+		AllowOrigins: []string{"*"},
+		AllowMethods: []string{"GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"},
+		AllowHeaders: []string{"Accept", "Authorization", "Content-Type", "X-Facility-ID"},
+	}))
+
+	router.Setup(app)
+
+	go func() {
+		if err := app.Listen(fmt.Sprintf("%s:%d", cfg.AppHost, cfg.AppPort)); err != nil {
+			utils.Log.WithError(err).Fatal("server listen failed")
+		}
+	}()
+
+	utils.Log.Infof("server running on :%d", cfg.AppPort)
+
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+
+	utils.Log.Info("shutting down server...")
+	if err := app.ShutdownWithTimeout(10 * time.Second); err != nil {
+		utils.Log.WithError(err).Error("server shutdown error")
+	}
+	utils.Log.Info("server stopped")
 }
 
-func main() {
+func customErrorHandler(c fiber.Ctx, err error) error {
+	code := fiber.StatusInternalServerError
+	message := "Internal Server Error"
 
-	server := server.NewServer()
-
-	// Create a done channel to signal when the shutdown is complete
-	done := make(chan bool, 1)
-
-	// Run graceful shutdown in a separate goroutine
-	go gracefulShutdown(server, done)
-
-	err := server.ListenAndServe()
-	if err != nil && err != http.ErrServerClosed {
-		panic(fmt.Sprintf("http server error: %s", err))
+	if e, ok := err.(*fiber.Error); ok {
+		code = e.Code
+		message = e.Message
 	}
 
-	// Wait for the graceful shutdown to complete
-	<-done
-	log.Println("Graceful shutdown complete.")
+	return c.Status(code).JSON(fiber.Map{
+		"success": false,
+		"error":   message,
+	})
 }
